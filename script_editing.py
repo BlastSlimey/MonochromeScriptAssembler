@@ -351,7 +351,7 @@ def assemble(f: PathLike | str, dest: PathLike | str):
         raise Exception("Missing '# commands'")
     # write script list
     stop_bytes = True
-    if script_lines[-1] == ["#", "no", "stop", "bytes"]:
+    if len(script_lines) > 0 and script_lines[-1] == ["#", "no", "stop", "bytes"]:
         stop_bytes = False
         script_lines.pop()
         debug(f"# no stop bytes at line {l}")
@@ -434,9 +434,25 @@ def assemble(f: PathLike | str, dest: PathLike | str):
 if __name__ == "__main__":
     # debug_active = True
     # print_disassembly = True
-    original = "assembled unknown/7_863"
-    text = "disassembled/863.asm"
-    reassembled = "reassembled/863.bin"
-    disassemble(original, text)
-    assemble(text, reassembled)
-    print("original == disassembled:", get_file_as_bytes(original) == get_file_as_bytes(reassembled))
+    # for i in [852]:
+    for i in [*range(0, 853, 2), *range(854, 899)]:
+    # for i in [*range(154, 853, 2), *range(854, 899)]:
+        if i < 10:
+            ii = f"00{i}"
+        elif i < 100:
+            ii = f"0{i}"
+        else:
+            ii = str(i)
+        try:
+            original = f"assembled unknown/7_{ii}"
+            text = f"disassembled/{ii}.asm"
+            reassembled = f"reassembled/{ii}.bin"
+            disassemble(original, text)
+            assemble(text, reassembled)
+            if get_file_as_bytes(original) == get_file_as_bytes(reassembled):
+                print(f"{ii} original == disassembled")
+            else:
+                print(f"{ii} is not equal, that's bad!")
+        except Exception as e:
+            print(f"{ii} failed: {e.args}")
+            # raise e
